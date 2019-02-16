@@ -1,10 +1,12 @@
 package gokeeper
 
 import (
+	"reflect"
 	"strings"
 )
 
 // ExtractKeyMap extract the key, value pair with same key prefix, and output the key value as a new map
+// m should be a map, and the key type should be string or it will panic
 // eg.,
 //   m := map[string]interface{}{
 //     "data.abc": 1,
@@ -15,17 +17,29 @@ import (
 // 		"abc": 1,
 // 		"bbc": "hello",
 // 	 }
-func ExtractKeyMap(m map[string]interface{}, prefix string) interface{} {
-	res := make(map[string]interface{})
-	for k, v := range m {
-		if strings.HasPrefix(k, prefix) {
-			res[k[len(prefix)+1:]] = v
+func ExtractKeyMap(m interface{}, prefix string) interface{} {
+	typ := reflect.TypeOf(m)
+	val := reflect.ValueOf(m)
+	if val.Kind() != reflect.Map {
+		panic("m must be a map")
+	}
+	if typ.Key().Kind() != reflect.String {
+		panic("key of map m should be type of string")
+	}
+
+	res := reflect.MakeMap(reflect.MapOf(typ.Key(), typ.Elem()))
+	for _, k := range val.MapKeys() {
+		ks := k.String()
+		if strings.HasPrefix(ks, prefix) {
+			ks = ks[len(prefix)+1:]
+			res.SetMapIndex(reflect.ValueOf(ks), val.MapIndex(k))
 		}
 	}
-	return res
+	return res.Interface()
 }
 
 // ExpandKeyMap expand the string map
+// m should be a map, and the key type should be string or it will panic
 // Eg., we have a map like this:
 //   m := map[string]interface{}{
 //     "data.abc": 1,
@@ -42,22 +56,32 @@ func ExtractKeyMap(m map[string]interface{}, prefix string) interface{} {
 //          }
 //      }
 //   }
-func ExpandKeyMap(m map[string]interface{}, separator string) interface{} {
-	res := make(map[string]interface{})
-	for k, v := range m {
-		if len(k) > 1 {
-			e := ExpandKey(k, separator, v)
-			mergeMap(res, e)
+func ExpandKeyMap(m interface{}, separator string) interface{} {
+	typ := reflect.TypeOf(m)
+	val := reflect.ValueOf(m)
+	if val.Kind() != reflect.Map {
+		panic("m must be a map")
+	}
+	if typ.Key().Kind() != reflect.String {
+		panic("key of map m should be type of string")
+	}
+
+	res := reflect.MakeMap(reflect.MapOf(typ.Key(), typ.Elem()))
+	for _, k := range val.MapKeys() {
+		ks := k.String()
+		if len(ks) > 1 {
+			e := ExpandKey(ks, separator, val.MapIndex(k).Interface())
+			mergeMap(res.Interface(), e)
 		} else {
 			// key contains no sep
-			res[k] = v
+			res.SetMapIndex(k, val.MapIndex(k))
 		}
 	}
-	return res
+	return res.Interface()
 }
 
 // ExpandKey expand the `sep` separated key into embedded map
-func ExpandKey(key, sep string, value interface{}) map[string]interface{} {
+func ExpandKey(key, sep string, value interface{}) interface{} {
 	i := strings.Index(key, sep)
 	if i == -1 {
 		return map[string]interface{}{
@@ -72,8 +96,17 @@ func ExpandKey(key, sep string, value interface{}) map[string]interface{} {
 }
 
 // mergeMap merge the r map into l map
-func mergeMap(l, r map[string]interface{}) {
-	for k, v := range r {
-		l[k] = v
+func mergeMap(l, r interface{}) {
+	lval := reflect.ValueOf(l)
+	rval := reflect.ValueOf(r)
+	if lval.Kind() != reflect.Map {
+		panic("l must be a map")
+	}
+	if rval.Kind() != reflect.Map {
+		panic("r must be a map")
+	}
+
+	for _, k := range rval.MapKeys() {
+		lval.SetMapIndex(k, rval.MapIndex(k))
 	}
 }

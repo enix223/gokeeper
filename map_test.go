@@ -5,6 +5,30 @@ import (
 	"testing"
 )
 
+func TestExpandKeyMapWithInvalidKeyType(t *testing.T) {
+	o := map[int]interface{}{
+		1: 1,
+		2: true,
+	}
+	defer func() {
+		exp := "key of map m should be type of string"
+		if e := recover().(string); e != exp {
+			t.Fatalf("exp: %v, got: %v", exp, e)
+		}
+	}()
+	ExpandKeyMap(o, ".")
+}
+
+func TestExpandKeyMapWithInvalidMap(t *testing.T) {
+	defer func() {
+		exp := "m must be a map"
+		if e := recover().(string); e != exp {
+			t.Fatalf("exp: %v, got: %v", exp, e)
+		}
+	}()
+	ExpandKeyMap(1, "a.b")
+}
+
 func TestExpandKeyWithDotSep(t *testing.T) {
 	k := "a.b.c.d"
 	m := ExpandKey(k, ".", 1)
@@ -89,6 +113,30 @@ func TestExpandKeyMapWithoutSep(t *testing.T) {
 	}
 }
 
+func TestExtractKeyMapWithInvalidKeyType(t *testing.T) {
+	o := map[int]interface{}{
+		1: 1,
+		2: true,
+	}
+	defer func() {
+		exp := "key of map m should be type of string"
+		if e := recover().(string); e != exp {
+			t.Fatalf("exp: %v, got: %v", exp, e)
+		}
+	}()
+	ExtractKeyMap(o, "a.b")
+}
+
+func TestExtractKeyMapWithInvalidMap(t *testing.T) {
+	defer func() {
+		exp := "m must be a map"
+		if e := recover().(string); e != exp {
+			t.Fatalf("exp: %v, got: %v", exp, e)
+		}
+	}()
+	ExtractKeyMap(1, "a.b")
+}
+
 func TestExtractKeyMap(t *testing.T) {
 	o := map[string]interface{}{
 		"a.b.c": 1,
@@ -113,4 +161,49 @@ func TestExtractKeyMapWithNoPrefixMatch(t *testing.T) {
 	if v, ok := m.(map[string]interface{}); !(len(v) == 0 && ok) {
 		t.Fatalf("exp: %v, got: %v", "empty map", m)
 	}
+}
+
+func TestMergeMap(t *testing.T) {
+	l := map[string]interface{}{
+		"a": 1,
+		"b": true,
+	}
+	r := map[string]interface{}{
+		"c": 2,
+		"d": "d",
+	}
+	ll := map[string]interface{}{}
+	for k, v := range l {
+		ll[k] = v
+	}
+	mergeMap(ll, r)
+	exp := map[string]interface{}{
+		"a": 1,
+		"b": true,
+		"c": 2,
+		"d": "d",
+	}
+	if !reflect.DeepEqual(exp, ll) {
+		t.Fatalf("exp: %v, got: %v", exp, ll)
+	}
+}
+
+func TestMergeMapWithInvalidLeftParam(t *testing.T) {
+	defer func() {
+		exp := "l must be a map"
+		if e := recover().(string); e != exp {
+			t.Fatalf("exp: %v, got: %v", exp, e)
+		}
+	}()
+	mergeMap(1, map[string]string{})
+}
+
+func TestMergeMapWithInvalidRightParam(t *testing.T) {
+	defer func() {
+		exp := "r must be a map"
+		if e := recover().(string); e != exp {
+			t.Fatalf("exp: %v, got: %v", exp, e)
+		}
+	}()
+	mergeMap(map[string]string{}, 2)
 }
