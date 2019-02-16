@@ -4,6 +4,27 @@ import (
 	"strings"
 )
 
+// ExtractKeyMap extract the key, value pair with same key prefix, and output the key value as a new map
+// eg.,
+//   m := map[string]interface{}{
+//     "data.abc": 1,
+//     "data.bbc": "hello",
+//   }
+// After extracted, the output is:
+//   o := map[string]interface{}{
+// 		"abc": 1,
+// 		"bbc": "hello",
+// 	 }
+func ExtractKeyMap(m map[string]interface{}, prefix string) interface{} {
+	res := make(map[string]interface{})
+	for k, v := range m {
+		if strings.HasPrefix(k, prefix) {
+			res[k[len(prefix)+1:]] = v
+		}
+	}
+	return res
+}
+
 // ExpandKeyMap expand the string map
 // Eg., we have a map like this:
 //   m := map[string]interface{}{
@@ -21,7 +42,7 @@ import (
 //          }
 //      }
 //   }
-func ExpandKeyMap(m map[string]interface{}, separator string) map[string]interface{} {
+func ExpandKeyMap(m map[string]interface{}, separator string) interface{} {
 	res := make(map[string]interface{})
 	for k, v := range m {
 		if len(k) > 1 {
