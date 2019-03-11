@@ -14,3 +14,12 @@ func TestDateISOFormat(t *testing.T) {
 		t.Errorf(expectValue, val, res)
 	}
 }
+
+func TestUnixNanoTime(t *testing.T) {
+	tn := time.Now()
+	ts := tn.UnixNano()
+	tc := UnixNanoTime(ts)
+	if tn.Sub(*tc) != 0 {
+		t.Errorf("exp: %v, got: %v", tn, tc)
+	}
+}

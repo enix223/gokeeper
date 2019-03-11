@@ -1,6 +1,9 @@
 package gokeeper
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func TestIsIn(t *testing.T) {
 	c1 := []byte{1, 2, 3, 4}
@@ -74,4 +77,53 @@ func TestContainWithWrongType(t *testing.T) {
 	}()
 
 	Contain(2, 1)
+}
+
+func TestSliceMapWithWrongType(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf(expectValue, "panic", "nil")
+		}
+	}()
+
+	SliceMap(2, func(i int, item interface{}) interface{} {
+		return i
+	})
+}
+
+func TestSliceMapWithEmptyMap(t *testing.T) {
+	m := []string{}
+	m1 := SliceMap(m, func(i int, item interface{}) interface{} {
+		return i
+	})
+
+	if m1 != nil {
+		t.Fatalf("exp: %v, got: %v", nil, m1)
+	}
+}
+
+func TestSliceMap(t *testing.T) {
+	m := []string{"a", "b"}
+	m1 := SliceMap(m, func(i int, item interface{}) interface{} {
+		return i
+	})
+
+	exp := []int{0, 1}
+	if !reflect.DeepEqual(exp, m1) {
+		t.Fatalf("exp: %v, got: %v", exp, m1)
+	}
+}
+
+func BenchmarkSliceMap(b *testing.B) {
+	m := []string{"a", "b"}
+	for i := 0; i < b.N; i++ {
+		m1 := SliceMap(m, func(i int, item interface{}) interface{} {
+			return i
+		})
+
+		exp := []int{0, 1}
+		if !reflect.DeepEqual(exp, m1) {
+			b.Fatalf("exp: %v, got: %v", exp, m1)
+		}
+	}
 }

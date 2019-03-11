@@ -207,3 +207,66 @@ func TestMergeMapWithInvalidRightParam(t *testing.T) {
 	}()
 	mergeMap(map[string]string{}, 2)
 }
+
+func TestGetMapValue(t *testing.T) {
+	m := map[string]interface{}{
+		"a": 1,
+		"b": "2",
+	}
+
+	v := GetMapValue(m, "a", 2)
+	val, ok := v.(int)
+	if !ok {
+		t.Fatalf("exp :%v, got: %v", true, ok)
+	}
+
+	exp := 1
+	if val != exp {
+		t.Fatalf("exp :%v, got: %v", exp, val)
+	}
+
+	v2 := GetMapValue(m, "c", 3)
+	val2, ok := v2.(int)
+	if !ok {
+		t.Fatalf("exp :%v, got: %v", true, ok)
+	}
+
+	exp2 := 3
+	if val2 != exp2 {
+		t.Fatalf("exp :%v, got: %v", exp2, val2)
+	}
+
+	i1, i2 := 1, 2
+	m2 := map[int]*int{
+		1: &i1,
+	}
+	v3 := GetMapValue(m2, 1, &i2)
+	val3, ok := v3.(*int)
+	if !ok {
+		t.Fatalf("exp :%v, got: %v", true, ok)
+	}
+
+	if val3 != &i1 {
+		t.Fatalf("exp :%v, got: %v", &i1, val3)
+	}
+
+	v4 := GetMapValue(m2, 2, &i2)
+	val4, ok := v4.(*int)
+	if !ok {
+		t.Fatalf("exp :%v, got: %v", true, ok)
+	}
+
+	if val4 != &i2 {
+		t.Fatalf("exp :%v, got: %v", &i2, val4)
+	}
+}
+
+func TestGetMapValueWithInvalidRightParam(t *testing.T) {
+	defer func() {
+		exp := "m must be a map"
+		if e := recover().(string); e != exp {
+			t.Fatalf("exp: %v, got: %v", exp, e)
+		}
+	}()
+	GetMapValue(1, 1, 1)
+}

@@ -43,3 +43,32 @@ func Contain(collection interface{}, item interface{}) bool {
 
 	return false
 }
+
+// MapFunc convert one instance to another instance
+type MapFunc func(idx int, item interface{}) interface{}
+
+// SliceMap iterate from the slice, and apply mapFunc to each item
+// and combine the map result to a new slice
+func SliceMap(slice interface{}, mapFunc MapFunc) interface{} {
+	val := reflect.ValueOf(slice)
+	if val.Kind() != reflect.Slice {
+		panic("slice should be a slice")
+	}
+
+	if val.Len() == 0 {
+		return nil
+	}
+
+	first := mapFunc(0, val.Index(0).Interface())
+	firstVal := reflect.ValueOf(first)
+	res := reflect.MakeSlice(reflect.SliceOf(firstVal.Type()), 0, val.Len())
+	res = reflect.Append(res, firstVal)
+
+	for i := 1; i < val.Len(); i++ {
+		nItem := mapFunc(i, val.Index(i).Interface())
+		nItemVal := reflect.ValueOf(nItem)
+		res = reflect.Append(res, nItemVal)
+	}
+
+	return res.Interface()
+}

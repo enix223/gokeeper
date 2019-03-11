@@ -5,6 +5,22 @@ import (
 	"strings"
 )
 
+// GetMapValue get value from map, or return defaultVal when key not exist
+func GetMapValue(m interface{}, key interface{}, defaultVal interface{}) interface{} {
+	val := reflect.ValueOf(m)
+	k := reflect.ValueOf(key)
+	if val.Kind() != reflect.Map {
+		panic("m must be a map")
+	}
+
+	value := val.MapIndex(k)
+	if !value.IsValid() {
+		return defaultVal
+	}
+
+	return value.Interface()
+}
+
 // ExtractKeyMap extract the key, value pair with same key prefix, and output the key value as a new map
 // m should be a map, and the key type should be string or it will panic
 // eg.,
