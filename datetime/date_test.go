@@ -1,4 +1,4 @@
-package gokeeper
+package datetime
 
 import (
 	"testing"
@@ -11,7 +11,7 @@ func TestDateISOFormat(t *testing.T) {
 	val := "2006-01-02 15:04:05.00"
 	res := FormatISOTime(&d)
 	if res != val {
-		t.Errorf(expectValue, val, res)
+		t.Errorf("expect: %v, got: %v", val, res)
 	}
 }
 

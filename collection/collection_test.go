@@ -1,4 +1,4 @@
-package gokeeper
+package collection
 
 import (
 	"reflect"
@@ -10,11 +10,11 @@ func TestIsIn(t *testing.T) {
 	c2 := []byte{1, 2, 3, 4, 5}
 
 	if !IsIn(c1, c2) {
-		t.Errorf(expectValue, true, false)
+		t.Errorf("expect: %v, got: %v", true, false)
 	}
 
 	if IsIn(c2, c1) {
-		t.Errorf(expectValue, false, true)
+		t.Errorf("expect: %v, got: %v", false, true)
 	}
 }
 
@@ -24,7 +24,7 @@ func TestIsInWithDiffType(t *testing.T) {
 
 	defer func() {
 		if r := recover(); r == nil {
-			t.Errorf(expectValue, "panic", "nil")
+			t.Errorf("expect: %v, got: %v", "panic", "nil")
 		}
 	}()
 
@@ -37,7 +37,7 @@ func TestIsInWithWrongTypeC1(t *testing.T) {
 
 	defer func() {
 		if r := recover(); r == nil {
-			t.Errorf(expectValue, "panic", "nil")
+			t.Errorf("expect: %v, got: %v", "panic", "nil")
 		}
 	}()
 
@@ -50,7 +50,7 @@ func TestIsInWithWrongTypeC2(t *testing.T) {
 
 	defer func() {
 		if r := recover(); r == nil {
-			t.Errorf(expectValue, "panic", "nil")
+			t.Errorf("expect: %v, got: %v", "panic", "nil")
 		}
 	}()
 
@@ -61,18 +61,18 @@ func TestContainOK(t *testing.T) {
 	c1 := []int{1, 2, 3, 4}
 
 	if !Contain(c1, 1) {
-		t.Errorf(expectValue, true, false)
+		t.Errorf("expect: %v, got: %v", true, false)
 	}
 
 	if Contain(c1, 10) {
-		t.Errorf(expectValue, false, true)
+		t.Errorf("expect: %v, got: %v", false, true)
 	}
 }
 
 func TestContainWithWrongType(t *testing.T) {
 	defer func() {
 		if r := recover(); r == nil {
-			t.Errorf(expectValue, "panic", "nil")
+			t.Errorf("expect: %v, got: %v", "panic", "nil")
 		}
 	}()
 
@@ -82,7 +82,7 @@ func TestContainWithWrongType(t *testing.T) {
 func TestSliceMapWithWrongType(t *testing.T) {
 	defer func() {
 		if r := recover(); r == nil {
-			t.Errorf(expectValue, "panic", "nil")
+			t.Errorf("expect: %v, got: %v", "panic", "nil")
 		}
 	}()
 

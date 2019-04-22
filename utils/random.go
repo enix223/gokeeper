@@ -1,4 +1,4 @@
-package gokeeper
+package utils
 
 import (
 	"math/rand"
