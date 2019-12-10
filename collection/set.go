@@ -1,0 +1,77 @@
+package collection
+
+// Set set implemented by map
+type Set map[interface{}]struct{}
+
+// NewSet create a new set
+func NewSet() Set {
+	return make(map[interface{}]struct{})
+}
+
+// Size get the size of the set
+func (s Set) Size() int {
+	return len(s)
+}
+
+// Add element into set
+func (s Set) Add(v ...interface{}) {
+	for _, val := range v {
+		s[val] = struct{}{}
+	}
+}
+
+// Has check if element v in the set
+func (s Set) Has(v interface{}) bool {
+	_, ok := s[v]
+	return ok
+}
+
+// Remove remove element(s) from the set
+func (s Set) Remove(v ...interface{}) {
+	for _, val := range v {
+		if _, ok := s[val]; ok {
+			delete(s, val)
+		}
+	}
+}
+
+// Intersect calculate the intersection of current set against the target set
+func (s Set) Intersect(a Set) Set {
+	n := NewSet()
+
+	for k := range s {
+		if _, ok := a[k]; ok {
+			n[k] = struct{}{}
+		}
+	}
+
+	return n
+}
+
+// Union calculate the union of the current set and the target set
+func (s Set) Union(a Set) Set {
+	n := NewSet()
+
+	for k := range s {
+		n[k] = struct{}{}
+	}
+
+	for k := range a {
+		n[k] = struct{}{}
+	}
+
+	return n
+}
+
+// Difference calculate the difference of the current set against the target set
+func (s Set) Difference(a Set) Set {
+	n := NewSet()
+
+	for k := range s {
+		if _, ok := a[k]; !ok {
+			n[k] = struct{}{}
+		}
+	}
+
+	return n
+}
