@@ -125,3 +125,32 @@ func TestSetUnhashableValueHas(t *testing.T) {
 	k := []string{"1"}
 	s1.Has(k)
 }
+
+func TestSetEqual(t *testing.T) {
+	s1 := NewSet()
+	s1.Add("1", "2", "3")
+	s2 := NewSet()
+	s2.Add("1", "2", "3")
+
+	if !s1.Equal(s2) {
+		t.Errorf("exp %v, got %v", "equal", "not equal")
+	}
+
+	s3 := NewSet()
+	s3.Add("1", "3")
+	if s1.Equal(s3) {
+		t.Errorf("exp %v, got %v", "not equal", "equal")
+	}
+
+	s4 := NewSet()
+	s4.Add("1", "2", "3", "4")
+	if s1.Equal(s4) {
+		t.Errorf("exp %v, got %v", "not equal", "equal")
+	}
+
+	s5 := NewSet()
+	s5.Add(1, 2, 3)
+	if s1.Equal(s5) {
+		t.Errorf("exp %v, got %v", "not equal", "equal")
+	}
+}

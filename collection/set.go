@@ -77,3 +77,22 @@ func (s Set) Difference(a Set) Set {
 
 	return n
 }
+
+// Equal compare each element in the set s against set a, return true
+// if all elements in set s equal to set a, and all element in set a equal
+// to elements in s
+func (s Set) Equal(a Set) bool {
+	for k := range s {
+		if _, ok := a[k]; !ok {
+			return false
+		}
+	}
+
+	for k := range a {
+		if _, ok := s[k]; !ok {
+			return false
+		}
+	}
+
+	return true
+}
