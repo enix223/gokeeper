@@ -14,10 +14,11 @@ func (s Set) Size() int {
 }
 
 // Add element into set
-func (s Set) Add(v ...interface{}) {
+func (s Set) Add(v ...interface{}) Set {
 	for _, val := range v {
 		s[val] = struct{}{}
 	}
+	return s
 }
 
 // Has check if element v in the set
@@ -27,12 +28,13 @@ func (s Set) Has(v interface{}) bool {
 }
 
 // Remove remove element(s) from the set
-func (s Set) Remove(v ...interface{}) {
+func (s Set) Remove(v ...interface{}) Set {
 	for _, val := range v {
 		if _, ok := s[val]; ok {
 			delete(s, val)
 		}
 	}
+	return s
 }
 
 // Intersect calculate the intersection of current set against the target set
