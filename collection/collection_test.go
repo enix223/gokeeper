@@ -127,3 +127,60 @@ func BenchmarkSliceMap(b *testing.B) {
 		}
 	}
 }
+
+func TestFilterSliceInt(b *testing.T) {
+	arr := []int{1, 2, 3}
+	res := FilterSlice(arr, func(v interface{}) bool {
+		return v.(int) == 2 || v.(int) == 1
+	})
+
+	exp := []int{1, 2}
+	if !reflect.DeepEqual(res, exp) {
+		b.Fatalf("exp: %v, got: %v", exp, res)
+	}
+}
+
+func TestFilterSliceEmpty(b *testing.T) {
+	arr := []int{1, 2, 3}
+	res := FilterSlice(arr, func(v interface{}) bool {
+		return v.(int) == 100
+	})
+
+	exp := []int{}
+	if !reflect.DeepEqual(res, exp) {
+		b.Fatalf("exp: %v, got: %v", exp, res)
+	}
+}
+
+func TestFilterSliceStruct(b *testing.T) {
+	type S struct {
+		Name string
+	}
+	arr := []S{
+		S{Name: "abc"},
+		S{Name: "bbc"},
+		S{Name: "bbq"},
+	}
+	res := FilterSlice(arr, func(v interface{}) bool {
+		return v.(S).Name == "bbc"
+	})
+
+	exp := []S{S{Name: "bbc"}}
+	if !reflect.DeepEqual(res, exp) {
+		b.Fatalf("exp: %v, got: %v", exp, res)
+	}
+
+	arr1 := []*S{
+		&S{Name: "abc"},
+		&S{Name: "bbc"},
+		&S{Name: "bbq"},
+	}
+	res1 := FilterSlice(arr1, func(v interface{}) bool {
+		return v.(*S).Name == "bbc"
+	})
+
+	exp1 := []*S{arr1[1]}
+	if !reflect.DeepEqual(res1, exp1) {
+		b.Fatalf("exp: %v, got: %v", exp, res)
+	}
+}

@@ -1,6 +1,11 @@
 package collection
 
-import "reflect"
+import (
+	"reflect"
+)
+
+// FilterFunc filter function
+type FilterFunc func(v interface{}) bool
 
 // IsIn test all elements in collection1 are in collection2
 func IsIn(collection1, collection2 interface{}) bool {
@@ -71,4 +76,25 @@ func SliceMap(slice interface{}, mapFunc MapFunc) interface{} {
 	}
 
 	return res.Interface()
+}
+
+// FilterSlice the given slice with given iterator function
+func FilterSlice(slice interface{}, iterator FilterFunc) interface{} {
+	t := reflect.TypeOf(slice)
+
+	if t.Kind() != reflect.Slice {
+		panic("slice should be slice")
+	}
+
+	v := reflect.ValueOf(slice)
+	r := reflect.MakeSlice(t, 0, 0)
+
+	for i := 0; i < v.Len(); i++ {
+		item := v.Index(i)
+		if iterator(item.Interface()) {
+			r = reflect.Append(r, item)
+		}
+	}
+
+	return r.Interface()
 }

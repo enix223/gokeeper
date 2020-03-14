@@ -3,6 +3,9 @@ package collection
 // Set set implemented by map
 type Set map[interface{}]struct{}
 
+// SetMapFunc map function
+type SetMapFunc func(v interface{}) interface{}
+
 // NewSet create a new set
 func NewSet() Set {
 	return make(map[interface{}]struct{})
@@ -95,4 +98,29 @@ func (s Set) Equal(a Set) bool {
 	}
 
 	return true
+}
+
+// Map apply fn to each element in set s, and return a new set
+func (s Set) Map(fn SetMapFunc) Set {
+	ns := NewSet()
+
+	for k := range s {
+		ns[fn(k)] = struct{}{}
+	}
+
+	return ns
+}
+
+// Filter call fn on each element, and add it into new set when
+// fn return true
+func (s Set) Filter(fn FilterFunc) Set {
+	ns := NewSet()
+
+	for k := range s {
+		if fn(k) {
+			ns[k] = struct{}{}
+		}
+	}
+
+	return ns
 }
