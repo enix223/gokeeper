@@ -140,6 +140,20 @@ func TestFilterSliceInt(b *testing.T) {
 	}
 }
 
+func TestFilterSliceInvalidType(t *testing.T) {
+	arr := [3]int{1, 2, 3}
+
+	defer func() {
+		if err := recover(); err == nil {
+			t.Fatal("should be panic")
+		}
+	}()
+
+	FilterSlice(arr, func(v interface{}) bool {
+		return v.(int) == 3
+	})
+}
+
 func TestFilterSliceEmpty(b *testing.T) {
 	arr := []int{1, 2, 3}
 	res := FilterSlice(arr, func(v interface{}) bool {
@@ -156,31 +170,45 @@ func TestFilterSliceStruct(b *testing.T) {
 	type S struct {
 		Name string
 	}
-	arr := []S{
-		S{Name: "abc"},
-		S{Name: "bbc"},
-		S{Name: "bbq"},
+	arr1 := []S{
+		{Name: "abc"},
+		{Name: "bbc"},
+		{Name: "bbq"},
 	}
-	res := FilterSlice(arr, func(v interface{}) bool {
+	res1 := FilterSlice(arr1, func(v interface{}) bool {
 		return v.(S).Name == "bbc"
 	})
 
-	exp := []S{S{Name: "bbc"}}
-	if !reflect.DeepEqual(res, exp) {
-		b.Fatalf("exp: %v, got: %v", exp, res)
+	exp1 := []S{{Name: "bbc"}}
+	if !reflect.DeepEqual(res1, exp1) {
+		b.Fatalf("exp: %v, got: %v", exp1, res1)
 	}
 
-	arr1 := []*S{
-		&S{Name: "abc"},
-		&S{Name: "bbc"},
-		&S{Name: "bbq"},
+	arr2 := []*S{
+		{Name: "abc"},
+		{Name: "bbc"},
+		{Name: "bbq"},
 	}
-	res1 := FilterSlice(arr1, func(v interface{}) bool {
+	res2 := FilterSlice(arr2, func(v interface{}) bool {
 		return v.(*S).Name == "bbc"
 	})
 
-	exp1 := []*S{arr1[1]}
-	if !reflect.DeepEqual(res1, exp1) {
-		b.Fatalf("exp: %v, got: %v", exp, res)
+	exp2 := []*S{arr2[1]}
+	if !reflect.DeepEqual(res2, exp2) {
+		b.Fatalf("exp: %v, got: %v", exp2, res2)
+	}
+
+	arr3 := []*S{
+		{Name: "abc"},
+		{Name: "bbc"},
+		{Name: "bbq"},
+	}
+	res3 := FilterSlice(&arr3, func(v interface{}) bool {
+		return v.(*S).Name == "bbc"
+	})
+
+	exp3 := []*S{arr3[1]}
+	if !reflect.DeepEqual(res3, exp3) {
+		b.Fatalf("exp: %v, got: %v", exp3, res3)
 	}
 }

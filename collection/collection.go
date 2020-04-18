@@ -81,12 +81,19 @@ func SliceMap(slice interface{}, mapFunc MapFunc) interface{} {
 // FilterSlice the given slice with given iterator function
 func FilterSlice(slice interface{}, iterator FilterFunc) interface{} {
 	t := reflect.TypeOf(slice)
+	v := reflect.ValueOf(slice)
 
-	if t.Kind() != reflect.Slice {
+	slicePtr := t.Kind() == reflect.Ptr && v.Elem().Kind() == reflect.Slice
+
+	if t.Kind() != reflect.Slice && !slicePtr {
 		panic("slice should be slice")
 	}
 
-	v := reflect.ValueOf(slice)
+	if slicePtr {
+		v = v.Elem()
+		t = v.Type()
+	}
+
 	r := reflect.MakeSlice(t, 0, 0)
 
 	for i := 0; i < v.Len(); i++ {
