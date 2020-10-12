@@ -13,12 +13,18 @@ func ExampleAESCBCEncrypt() {
 	var passphrase = "Impassphrasegood"
 
 	// encrypt
-	encryptedData := cipher.AESCBCEncrypt(plainText, []byte(passphrase), []byte(initialVector))
+	encryptedData, err := cipher.AESCBCEncrypt(plainText, []byte(passphrase), []byte(initialVector))
+	if err != nil {
+		panic(err.Error())
+	}
 	encryptedString := base64.StdEncoding.EncodeToString(encryptedData)
 
 	// decrypt
 	encryptedData, _ = base64.StdEncoding.DecodeString(encryptedString)
-	decryptedText := cipher.AESCBCDecrypt(encryptedData, []byte(passphrase), []byte(initialVector))
+	decryptedText, err := cipher.AESCBCDecrypt(encryptedData, []byte(passphrase), []byte(initialVector))
+	if err != nil {
+		panic(err.Error())
+	}
 	fmt.Printf("plain: %s", string(decryptedText))
 	// Output: plain: Golang Programs
 }
