@@ -6,35 +6,52 @@ import (
 )
 
 // AESCBCEncrypt AES CBC encrypt
-func AESCBCEncrypt(plainText string, key, iv []byte) ([]byte, error) {
+func AESCBCEncrypt(plainText []byte, key, iv []byte, paddingType ...string) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
 	}
-	if plainText == "" {
+	if len(plainText) == 0 {
 		return nil, ErrInvalidPlainText
 	}
 	ecb := cipher.NewCBCEncrypter(block, iv)
-	content := []byte(plainText)
-	content = PKCS5Padding(content, block.BlockSize())
-	crypted := make([]byte, len(content))
-	ecb.CryptBlocks(crypted, content)
+	if len(paddingType) > 0 {
+		switch paddingType[0] {
+		case PaddingTypeZero:
+			plainText = ZeroPadding(plainText, block.BlockSize())
+		case PaddingTypePKCS5:
+			plainText = PKCS5Padding(plainText, block.BlockSize())
+		}
+	} else {
+		plainText = PKCS5Padding(plainText, block.BlockSize())
+	}
+	crypted := make([]byte, len(plainText))
+	ecb.CryptBlocks(crypted, plainText)
 
 	return crypted, nil
 }
 
 // AESCBCDecrypt AES CBC decrypt
-func AESCBCDecrypt(crypt []byte, key, iv []byte) ([]byte, error) {
+func AESCBCDecrypt(cipherText []byte, key, iv []byte, paddingType ...string) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
 	}
-	if len(crypt) == 0 {
+	if len(cipherText) == 0 {
 		return nil, ErrInvalidPlainText
 	}
 	ecb := cipher.NewCBCDecrypter(block, iv)
-	decrypted := make([]byte, len(crypt))
-	ecb.CryptBlocks(decrypted, crypt)
-
-	return PKCS5Trimming(decrypted), nil
+	plaintext := make([]byte, len(cipherText))
+	ecb.CryptBlocks(plaintext, cipherText)
+	if len(paddingType) > 0 {
+		switch paddingType[0] {
+		case PaddingTypeZero:
+			plaintext = ZeroTrimming(plaintext)
+		case PaddingTypePKCS5:
+			plaintext = PKCS5Trimming(plaintext)
+		}
+	} else {
+		plaintext = PKCS5Trimming(plaintext)
+	}
+	return plaintext, nil
 }
