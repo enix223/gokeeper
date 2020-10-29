@@ -212,3 +212,129 @@ func TestFilterSliceStruct(b *testing.T) {
 		b.Fatalf("exp: %v, got: %v", exp3, res3)
 	}
 }
+
+func TestAnyWithSlice(t *testing.T) {
+	a := []int{1, 2, 3, 4}
+
+	res := Any(a, func(item interface{}) bool {
+		return item.(int) > 5
+	})
+
+	if res {
+		t.Fatal("exp: false, got true")
+	}
+
+	res = Any(a, func(item interface{}) bool {
+		return item.(int) >= 4
+	})
+
+	if !res {
+		t.Fatal("exp: true, got false")
+	}
+
+	// ptr
+	res = Any(&a, func(item interface{}) bool {
+		return item.(int) >= 4
+	})
+
+	if !res {
+		t.Fatal("exp: true, got false")
+	}
+}
+
+func TestAnyWithInvalidType(t *testing.T) {
+	defer func() {
+		if err := recover(); err == nil {
+			t.Fatal("expect panic, but got nil")
+		}
+	}()
+
+	Any(1, func(item interface{}) bool {
+		return true
+	})
+}
+
+func TestAnyWithDiffElementType(t *testing.T) {
+	a := []interface{}{1, nil, 12.0}
+
+	res := Any(a, func(item interface{}) bool {
+		return item != nil
+	})
+
+	if !res {
+		t.Fatal("exp: true, got false")
+	}
+
+	a = []interface{}{nil, nil, nil}
+
+	res = Any(a, func(item interface{}) bool {
+		return item != nil
+	})
+
+	if res {
+		t.Fatal("exp: false, got true")
+	}
+}
+
+func TestAllWithSlice(t *testing.T) {
+	a := []int{1, 2, 3, 4}
+
+	res := All(a, func(item interface{}) bool {
+		return item.(int) > 5
+	})
+
+	if res {
+		t.Fatal("exp: false, got true")
+	}
+
+	res = All(a, func(item interface{}) bool {
+		return item.(int) >= 1
+	})
+
+	if !res {
+		t.Fatal("exp: true, got false")
+	}
+
+	// ptr
+	res = All(&a, func(item interface{}) bool {
+		return item.(int) >= 1
+	})
+
+	if !res {
+		t.Fatal("exp: true, got false")
+	}
+}
+
+func TestAllWithInvalidType(t *testing.T) {
+	defer func() {
+		if err := recover(); err == nil {
+			t.Fatal("expect panic, but got nil")
+		}
+	}()
+
+	All(1, func(item interface{}) bool {
+		return true
+	})
+}
+
+func TestAllWithDiffElementType(t *testing.T) {
+	a := []interface{}{1, nil, 12.0}
+
+	res := All(a, func(item interface{}) bool {
+		return item != nil
+	})
+
+	if res {
+		t.Fatal("exp: false, got true")
+	}
+
+	a = []interface{}{1, "bool", true}
+
+	res = Any(a, func(item interface{}) bool {
+		return item != nil
+	})
+
+	if !res {
+		t.Fatal("exp: true, got false")
+	}
+}

@@ -105,3 +105,63 @@ func FilterSlice(slice interface{}, iterator FilterFunc) interface{} {
 
 	return r.Interface()
 }
+
+// TestFunc bool test iterator function
+type TestFunc func(item interface{}) bool
+
+// Any Enumerate each element in given slice, and call the iterator function
+// to check if it is true, if any of the iterator function return
+// value is true, then return true, otherwise return false
+func Any(slice interface{}, iterator TestFunc) bool {
+	t := reflect.TypeOf(slice)
+	v := reflect.ValueOf(slice)
+
+	slicePtr := t.Kind() == reflect.Ptr && v.Elem().Kind() == reflect.Slice
+
+	if t.Kind() != reflect.Slice && !slicePtr {
+		panic("slice should be slice")
+	}
+
+	if slicePtr {
+		v = v.Elem()
+		t = v.Type()
+	}
+
+	for i := 0; i < v.Len(); i++ {
+		item := v.Index(i)
+		if iterator(item.Interface()) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// All Enumerate each element in given slice, and call the iterator function
+// to check if it is true, if any of the iterator function return
+// value is true, then return true, otherwise return false
+func All(slice interface{}, iterator TestFunc) bool {
+	t := reflect.TypeOf(slice)
+	v := reflect.ValueOf(slice)
+
+	slicePtr := t.Kind() == reflect.Ptr && v.Elem().Kind() == reflect.Slice
+
+	if t.Kind() != reflect.Slice && !slicePtr {
+		panic("slice should be slice")
+	}
+
+	if slicePtr {
+		v = v.Elem()
+		t = v.Type()
+	}
+
+	for i := 0; i < v.Len(); i++ {
+		item := v.Index(i)
+		v := iterator(item.Interface())
+		if !v {
+			return false
+		}
+	}
+
+	return true
+}
