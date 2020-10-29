@@ -338,3 +338,44 @@ func TestAllWithDiffElementType(t *testing.T) {
 		t.Fatal("exp: true, got false")
 	}
 }
+
+func TestAnyNil(t *testing.T) {
+	a := []interface{}{1, nil, 12.0}
+	res := AnyNil(a)
+	if !res {
+		t.Fatal("exp: true, got false")
+	}
+
+	a = []interface{}{1, nil, nil}
+	res = AnyNil(a)
+	if !res {
+		t.Fatal("exp: true, got false")
+	}
+
+	a = []interface{}{1, true, "bool"}
+	res = AnyNil(a)
+	if res {
+		t.Fatal("exp: false, got true")
+	}
+}
+
+func TestAllNil(t *testing.T) {
+	a := []interface{}{1, nil, 12.0}
+
+	res := AllNil(a)
+	if res {
+		t.Fatal("exp: false, got true")
+	}
+
+	a = []interface{}{1, nil, nil}
+	res = AllNil(a)
+	if res {
+		t.Fatal("exp: false, got true")
+	}
+
+	a = []interface{}{nil, nil, nil}
+	res = AllNil(a)
+	if !res {
+		t.Fatal("exp: true, got false")
+	}
+}

@@ -109,7 +109,7 @@ func FilterSlice(slice interface{}, iterator FilterFunc) interface{} {
 // TestFunc bool test iterator function
 type TestFunc func(item interface{}) bool
 
-// Any Enumerate each element in given slice, and call the iterator function
+// Any enumerate each element in given slice, and call the iterator function
 // to check if it is true, if any of the iterator function return
 // value is true, then return true, otherwise return false
 func Any(slice interface{}, iterator TestFunc) bool {
@@ -137,7 +137,15 @@ func Any(slice interface{}, iterator TestFunc) bool {
 	return false
 }
 
-// All Enumerate each element in given slice, and call the iterator function
+// AnyNil enumerate each element in the slice to check if it is nil
+// if any of the element is nil, return true, otherwise return false
+func AnyNil(slice interface{}) bool {
+	return Any(slice, func(item interface{}) bool {
+		return item == nil
+	})
+}
+
+// All enumerate each element in given slice, and call the iterator function
 // to check if it is true, if any of the iterator function return
 // value is true, then return true, otherwise return false
 func All(slice interface{}, iterator TestFunc) bool {
@@ -164,4 +172,12 @@ func All(slice interface{}, iterator TestFunc) bool {
 	}
 
 	return true
+}
+
+// AllNil enumerate each element in the slice to check if it is nil
+// if all of them are nil, return true, otherwise return false
+func AllNil(slice interface{}) bool {
+	return All(slice, func(item interface{}) bool {
+		return item == nil
+	})
 }
