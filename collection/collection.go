@@ -145,6 +145,14 @@ func AnyNil(slice interface{}) bool {
 	})
 }
 
+// AnyNotNil enumerate each element in the slice to check if it is not nil
+// if any of the element is not nil, return true, otherwise return false
+func AnyNotNil(slice interface{}) bool {
+	return Any(slice, func(item interface{}) bool {
+		return item != nil
+	})
+}
+
 // All enumerate each element in given slice, and call the iterator function
 // to check if it is true, if any of the iterator function return
 // value is true, then return true, otherwise return false
@@ -179,5 +187,13 @@ func All(slice interface{}, iterator TestFunc) bool {
 func AllNil(slice interface{}) bool {
 	return All(slice, func(item interface{}) bool {
 		return item == nil
+	})
+}
+
+// AllNotNil enumerate each element in the slice to check if it is not nil
+// if all of them are nil, return true, otherwise return false
+func AllNotNil(slice interface{}) bool {
+	return All(slice, func(item interface{}) bool {
+		return item != nil
 	})
 }

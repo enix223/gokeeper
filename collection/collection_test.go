@@ -359,6 +359,32 @@ func TestAnyNil(t *testing.T) {
 	}
 }
 
+func TestAnyNotNil(t *testing.T) {
+	a := []interface{}{1, nil, 12.0}
+	res := AnyNotNil(a)
+	if !res {
+		t.Fatal("exp: true, got false")
+	}
+
+	a = []interface{}{1, nil, nil}
+	res = AnyNotNil(a)
+	if !res {
+		t.Fatal("exp: true, got false")
+	}
+
+	a = []interface{}{1, true, "bool"}
+	res = AnyNotNil(a)
+	if !res {
+		t.Fatal("exp: true, got false")
+	}
+
+	a = []interface{}{nil, nil, nil}
+	res = AnyNotNil(a)
+	if res {
+		t.Fatal("exp: false, got true")
+	}
+}
+
 func TestAllNil(t *testing.T) {
 	a := []interface{}{1, nil, 12.0}
 
@@ -375,6 +401,33 @@ func TestAllNil(t *testing.T) {
 
 	a = []interface{}{nil, nil, nil}
 	res = AllNil(a)
+	if !res {
+		t.Fatal("exp: true, got false")
+	}
+}
+
+func TestAllNotNil(t *testing.T) {
+	a := []interface{}{1, nil, 12.0}
+
+	res := AllNotNil(a)
+	if res {
+		t.Fatal("exp: false, got true")
+	}
+
+	a = []interface{}{1, nil, nil}
+	res = AllNotNil(a)
+	if res {
+		t.Fatal("exp: false, got true")
+	}
+
+	a = []interface{}{nil, nil, nil}
+	res = AllNotNil(a)
+	if res {
+		t.Fatal("exp: false, got true")
+	}
+
+	a = []interface{}{1, "a", true}
+	res = AllNotNil(a)
 	if !res {
 		t.Fatal("exp: true, got false")
 	}
