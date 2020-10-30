@@ -11,6 +11,7 @@ func TestAESECBDecrypt(t *testing.T) {
 	paddings := [][]string{
 		{PaddingTypeZero},
 		{PaddingTypePKCS5},
+		{PaddingTypePKCS7},
 		{},
 	}
 	for _, padding := range paddings {

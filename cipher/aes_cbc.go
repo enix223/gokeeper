@@ -21,6 +21,8 @@ func AESCBCEncrypt(plainText []byte, key, iv []byte, paddingType ...string) ([]b
 			plainText = ZeroPadding(plainText, block.BlockSize())
 		case PaddingTypePKCS5:
 			plainText = PKCS5Padding(plainText, block.BlockSize())
+		case PaddingTypePKCS7:
+			plainText = PKCS7Padding(plainText, block.BlockSize())
 		}
 	} else {
 		plainText = PKCS5Padding(plainText, block.BlockSize())
@@ -46,12 +48,14 @@ func AESCBCDecrypt(cipherText []byte, key, iv []byte, paddingType ...string) ([]
 	if len(paddingType) > 0 {
 		switch paddingType[0] {
 		case PaddingTypeZero:
-			plaintext = ZeroTrimming(plaintext)
+			plaintext = ZeroUnpadding(plaintext)
 		case PaddingTypePKCS5:
-			plaintext = PKCS5Trimming(plaintext)
+			plaintext = PKCS5Unpadding(plaintext)
+		case PaddingTypePKCS7:
+			plaintext = PKCS7Unpadding(plaintext)
 		}
 	} else {
-		plaintext = PKCS5Trimming(plaintext)
+		plaintext = PKCS5Unpadding(plaintext)
 	}
 	return plaintext, nil
 }

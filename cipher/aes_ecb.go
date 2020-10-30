@@ -78,6 +78,8 @@ func AESECBEncrypt(plaintext []byte, key []byte, paddingType ...string) (ciphert
 			plaintext = ZeroPadding(plaintext, aes.BlockSize)
 		case PaddingTypePKCS5:
 			plaintext = PKCS5Padding(plaintext, aes.BlockSize)
+		case PaddingTypePKCS7:
+			plaintext = PKCS7Padding(plaintext, aes.BlockSize)
 		}
 	} else {
 		plaintext = PKCS5Padding(plaintext, aes.BlockSize)
@@ -115,12 +117,14 @@ func AESECBDecrypt(ciphertext []byte, key []byte, paddingType ...string) (plaint
 	if len(paddingType) > 0 {
 		switch paddingType[0] {
 		case PaddingTypeZero:
-			plaintext = ZeroTrimming(ciphertext)
+			plaintext = ZeroUnpadding(ciphertext)
 		case PaddingTypePKCS5:
-			plaintext = PKCS5Trimming(ciphertext)
+			plaintext = PKCS5Unpadding(ciphertext)
+		case PaddingTypePKCS7:
+			plaintext = PKCS7Unpadding(ciphertext)
 		}
 	} else {
-		plaintext = PKCS5Trimming(ciphertext)
+		plaintext = PKCS5Unpadding(ciphertext)
 	}
 	return plaintext, nil
 }
