@@ -7,6 +7,9 @@ import (
 // FilterFunc filter function
 type FilterFunc func(v interface{}) bool
 
+// ReduceFunc reduce function
+type ReduceFunc func(accumulator, currentValue interface{}, index int) interface{}
+
 // IsIn test all elements in collection1 are in collection2
 func IsIn(collection1, collection2 interface{}) bool {
 	v1 := reflect.ValueOf(collection1)
@@ -104,6 +107,31 @@ func FilterSlice(slice interface{}, iterator FilterFunc) interface{} {
 	}
 
 	return r.Interface()
+}
+
+// ReduceSlice executes a reducer function (that you provide) on each element of the slice,
+// resulting in single output value.
+func ReduceSlice(slice interface{}, initialValue interface{}, reduceFunc ReduceFunc) interface{} {
+	t := reflect.TypeOf(slice)
+	v := reflect.ValueOf(slice)
+
+	slicePtr := t.Kind() == reflect.Ptr && v.Elem().Kind() == reflect.Slice
+
+	if t.Kind() != reflect.Slice && !slicePtr {
+		panic("slice should be slice")
+	}
+
+	if slicePtr {
+		v = v.Elem()
+		t = v.Type()
+	}
+
+	accumulator := initialValue
+	for i := 0; i < v.Len(); i++ {
+		item := v.Index(i).Interface()
+		accumulator = reduceFunc(accumulator, item, i)
+	}
+	return accumulator
 }
 
 // TestFunc bool test iterator function

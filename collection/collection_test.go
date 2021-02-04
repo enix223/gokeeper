@@ -432,3 +432,41 @@ func TestAllNotNil(t *testing.T) {
 		t.Fatal("exp: true, got false")
 	}
 }
+
+func TestReduceSliceInt(t *testing.T) {
+	a := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+	res := ReduceSlice(a, 0, func(accumulator, currentValue interface{}, index int) interface{} {
+		return accumulator.(int) + currentValue.(int)
+	})
+
+	exp := 55
+	if res.(int) != exp {
+		t.Fatalf("exp : %v, got: %v", exp, res)
+	}
+}
+
+func TestReduceSliceString(t *testing.T) {
+	a := []string{"a", "b", "c", "d", "e", "f", "g", "h"}
+	res := ReduceSlice(a, "", func(accumulator, currentValue interface{}, index int) interface{} {
+		return accumulator.(string) + currentValue.(string)
+	})
+
+	exp := "abcdefgh"
+	if res.(string) != exp {
+		t.Fatalf("exp : %v, got: %v", exp, res)
+	}
+}
+
+func TestReduceSliceWithInvalidParam(t *testing.T) {
+	v := "1"
+
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("expect: %v, got: %v", "panic", "nil")
+		}
+	}()
+
+	ReduceSlice(v, "", func(accumulator, currentValue interface{}, index int) interface{} {
+		return accumulator.(string) + currentValue.(string)
+	})
+}
