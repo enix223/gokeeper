@@ -10,6 +10,9 @@ type FilterFunc func(v interface{}) bool
 // ReduceFunc reduce function
 type ReduceFunc func(accumulator, currentValue interface{}, index int) interface{}
 
+// EqualFunc function to check if left is equal to right
+type EqualFunc func(left interface{}, right interface{}) bool
+
 // IsIn test all elements in collection1 are in collection2
 func IsIn(collection1, collection2 interface{}) bool {
 	v1 := reflect.ValueOf(collection1)
@@ -45,6 +48,23 @@ func Contain(collection interface{}, item interface{}) bool {
 	for i := 0; i < v.Len(); i++ {
 		val := v.Index(i)
 		if reflect.DeepEqual(val.Interface(), item) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// ContainWithEqualFunction test if `item` in `collection`
+func ContainWithEqualFunction(collection interface{}, item interface{}, equalFn EqualFunc) bool {
+	v := reflect.ValueOf(collection)
+	if v.Kind() != reflect.Slice {
+		panic("collection should be a slice")
+	}
+
+	for i := 0; i < v.Len(); i++ {
+		val := v.Index(i)
+		if equalFn(val.Interface(), item) {
 			return true
 		}
 	}

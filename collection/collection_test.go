@@ -470,3 +470,69 @@ func TestReduceSliceWithInvalidParam(t *testing.T) {
 		return accumulator.(string) + currentValue.(string)
 	})
 }
+
+func TestIntContainWithEqualFunction(t *testing.T) {
+	v1 := 1
+	c := []int{2, 1, 3}
+	equal := func(left, right interface{}) bool {
+		return left.(int) == right.(int)
+	}
+
+	res := ContainWithEqualFunction(c, v1, equal)
+	if !res {
+		t.Fatalf("exp: true, got: false")
+	}
+
+	v2 := 0
+	res = ContainWithEqualFunction(c, v2, equal)
+	if res {
+		t.Fatalf("exp: false, got: true")
+	}
+}
+
+func TestStringContainWithEqualFunction(t *testing.T) {
+	v1 := "1"
+	c := []string{"2", "1", "3"}
+	equal := func(left, right interface{}) bool {
+		return left.(string) == right.(string)
+	}
+
+	res := ContainWithEqualFunction(c, v1, equal)
+	if !res {
+		t.Fatalf("exp: true, got: false")
+	}
+
+	v2 := "0"
+	res = ContainWithEqualFunction(c, v2, equal)
+	if res {
+		t.Fatalf("exp: false, got: true")
+	}
+}
+
+func TestStructContainWithEqualFunction(t *testing.T) {
+	type a struct {
+		ID   int
+		Name string
+	}
+
+	v1 := a{ID: 1, Name: "1"}
+	c := []a{
+		{ID: 2, Name: "2"},
+		{ID: 1, Name: "1"},
+		{ID: 3, Name: "3"},
+	}
+	equal := func(left, right interface{}) bool {
+		return left.(a).ID == right.(a).ID
+	}
+
+	res := ContainWithEqualFunction(c, v1, equal)
+	if !res {
+		t.Fatalf("exp: true, got: false")
+	}
+
+	v2 := a{ID: 0, Name: "1"}
+	res = ContainWithEqualFunction(c, v2, equal)
+	if res {
+		t.Fatalf("exp: false, got: true")
+	}
+}
