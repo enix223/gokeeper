@@ -270,3 +270,151 @@ func TestGetMapValueWithInvalidRightParam(t *testing.T) {
 	}()
 	GetMapValue(1, 1, 1)
 }
+
+func TestKeyOfMapWithNormalMap(t *testing.T) {
+	m := map[int]int{
+		1: 2,
+		2: 3,
+		3: 4,
+	}
+	res := KeysOfMap(m)
+	exp := []int{1, 2, 3}
+	if !sliceElementEqual(res, exp) {
+		t.Fatalf("exp: %v, got: %v", exp, res)
+	}
+
+	m2 := map[string]struct{}{
+		"1": {},
+		"2": {},
+		"3": {},
+	}
+	res2 := KeysOfMap(m2)
+	exp2 := []string{"1", "2", "3"}
+	if !sliceElementEqual(res2, exp2) {
+		t.Fatalf("exp: %v, got: %v", exp2, res2)
+	}
+
+	m3 := map[interface{}]interface{}{
+		1:   1,
+		"2": 2,
+	}
+	res3 := KeysOfMap(m3)
+	exp3 := []interface{}{1, "2"}
+	if !sliceElementEqual(res3, exp3) {
+		t.Fatalf("exp: %v, got: %v", exp3, res3)
+	}
+}
+
+func TestKeyOfMapWithNilMap(t *testing.T) {
+	defer func() {
+		exp := "m should not be nil"
+		if e := recover().(string); e != exp {
+			t.Fatalf("exp: %v, got: %v", exp, e)
+		}
+	}()
+	KeysOfMap(nil)
+}
+
+func TestKeyOfMapWithEmptyMap(t *testing.T) {
+	var m map[int]string
+	res := KeysOfMap(m)
+	if res != nil {
+		t.Fatalf("exp: nil, got: %v", res)
+	}
+}
+
+func TestKeyOfMapWithNoMap(t *testing.T) {
+	defer func() {
+		exp := "m should be type of map"
+		if e := recover().(string); e != exp {
+			t.Fatalf("exp: %v, got: %v", exp, e)
+		}
+	}()
+	var m []string
+	KeysOfMap(m)
+}
+
+func TestValueOfMapWithNormalMap(t *testing.T) {
+	m := map[int]int{
+		1: 2,
+		2: 3,
+		3: 4,
+	}
+	res := ValuesOfMap(m)
+	exp := []int{2, 3, 4}
+	if !sliceElementEqual(res, exp) {
+		t.Fatalf("exp: %v, got: %v", exp, res)
+	}
+
+	type s struct {
+		a int
+	}
+	s1 := s{a: 1}
+	s2 := s{a: 2}
+	s3 := s{a: 3}
+	m2 := map[string]s{
+		"1": s1,
+		"2": s2,
+		"3": s3,
+	}
+	res2 := ValuesOfMap(m2)
+	exp2 := []s{s1, s2, s3}
+	if !sliceElementEqual(res2, exp2) {
+		t.Fatalf("exp: %v, got: %v", exp2, res2)
+	}
+
+	m3 := map[interface{}]interface{}{
+		1:   1,
+		"2": 2,
+	}
+	res3 := ValuesOfMap(m3)
+	exp3 := []interface{}{1, 2}
+	if !sliceElementEqual(res3, exp3) {
+		t.Fatalf("exp: %v, got: %v", exp3, res3)
+	}
+}
+
+func TestValueOfMapWithNilMap(t *testing.T) {
+	defer func() {
+		exp := "m should not be nil"
+		if e := recover().(string); e != exp {
+			t.Fatalf("exp: %v, got: %v", exp, e)
+		}
+	}()
+	ValuesOfMap(nil)
+}
+
+func TestValueOfMapWithEmptyMap(t *testing.T) {
+	var m map[int]string
+	res := ValuesOfMap(m)
+	if res != nil {
+		t.Fatalf("exp: nil, got: %v", res)
+	}
+}
+
+func TestValueOfMapWithNoMap(t *testing.T) {
+	defer func() {
+		exp := "m should be type of map"
+		if e := recover().(string); e != exp {
+			t.Fatalf("exp: %v, got: %v", exp, e)
+		}
+	}()
+	var m []string
+	ValuesOfMap(m)
+}
+
+func sliceElementEqual(slice1, slice2 interface{}) bool {
+	val1 := reflect.ValueOf(slice1)
+	val2 := reflect.ValueOf(slice2)
+	m := make(map[interface{}]struct{})
+	if val1.Len() != val2.Len() {
+		return false
+	}
+	for i := 0; i < val1.Len(); i++ {
+		m[val1.Index(i).Interface()] = struct{}{}
+	}
+	for i := 0; i < val2.Len(); i++ {
+		m[val2.Index(i).Interface()] = struct{}{}
+	}
+	return len(m) == val1.Len()
+}

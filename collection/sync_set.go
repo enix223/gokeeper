@@ -43,9 +43,7 @@ func (s *SyncSet) Remove(v ...interface{}) *SyncSet {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	for _, val := range v {
-		if _, ok := s.set[val]; ok {
-			delete(s.set, val)
-		}
+		delete(s.set, val)
 	}
 	return s
 }

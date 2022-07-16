@@ -143,7 +143,6 @@ func ReduceSlice(slice interface{}, initialValue interface{}, reduceFunc ReduceF
 
 	if slicePtr {
 		v = v.Elem()
-		t = v.Type()
 	}
 
 	accumulator := initialValue
@@ -172,7 +171,6 @@ func Any(slice interface{}, iterator TestFunc) bool {
 
 	if slicePtr {
 		v = v.Elem()
-		t = v.Type()
 	}
 
 	for i := 0; i < v.Len(); i++ {
@@ -216,7 +214,6 @@ func All(slice interface{}, iterator TestFunc) bool {
 
 	if slicePtr {
 		v = v.Elem()
-		t = v.Type()
 	}
 
 	for i := 0; i < v.Len(); i++ {

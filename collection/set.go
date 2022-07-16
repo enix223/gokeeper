@@ -33,9 +33,7 @@ func (s Set) Has(v interface{}) bool {
 // Remove remove element(s) from the set
 func (s Set) Remove(v ...interface{}) Set {
 	for _, val := range v {
-		if _, ok := s[val]; ok {
-			delete(s, val)
-		}
+		delete(s, val)
 	}
 	return s
 }
