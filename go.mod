@@ -4,7 +4,7 @@ go 1.22
 
 require (
 	github.com/stretchr/testify v1.9.0
-	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
+	golang.org/x/crypto v0.26.0
 )
 
 require (
