@@ -2,81 +2,80 @@ package list
 
 import "github.com/enix223/gokeeper/stack"
 
-type node struct {
-	next  *node
-	value interface{}
+type node[T any] struct {
+	next  *node[T]
+	value T
 }
 
 // StackImpl stack implementation with linked list
-type StackImpl struct {
-	head        *node
+type StackImpl[T any] struct {
+	head        *node[T]
 	size        uint
 	currentSize uint
 }
 
 // NewStack create a stack, if size equal 0, then error = ErrStackInvalidSize
-func NewStack(size uint) (stack.Stack, error) {
+func NewStack[T any](size uint) stack.Stack[T] {
 	if size == 0 {
-		return nil, stack.ErrStackInvalidSize
+		panic("size should not be 0")
 	}
 
-	a := new(StackImpl)
+	a := new(StackImpl[T])
 	a.head = nil
 	a.size = size
 	a.currentSize = 0
-	return a, nil
+	return a
 }
 
 // IsEmpty check stack is empty or not
-func (a *StackImpl) IsEmpty() bool {
+func (a *StackImpl[T]) IsEmpty() bool {
 	return a.head == nil
 }
 
 // IsFull check stack is full or not
-func (a *StackImpl) IsFull() bool {
+func (a *StackImpl[T]) IsFull() bool {
 	return a.currentSize == a.size
 }
 
 // MakeEmpty clear stack
-func (a *StackImpl) MakeEmpty() {
+func (a *StackImpl[T]) MakeEmpty() {
 	a.head = nil
 	a.currentSize = 0
 }
 
 // Push push an element into the stack.
 // if stack is full, then error = ErrStackFull
-func (a *StackImpl) Push(elem interface{}) error {
+func (a *StackImpl[T]) Push(elem T) {
 	if a.IsFull() {
-		return stack.ErrStackFull
+		panic("stack is full")
 	}
 
-	n := new(node)
+	n := new(node[T])
 	n.next = a.head
 	n.value = elem
 	a.head = n
 	a.currentSize++
-	return nil
 }
 
 // Top returns the element at the top of the stack
 // If stack is empty, then error = ErrStackEmpty
-func (a *StackImpl) Top() (interface{}, error) {
+func (a *StackImpl[T]) Top() T {
 	if a.IsEmpty() {
-		return nil, stack.ErrStackEmpty
+		panic("stack is empty")
 	}
 
-	return a.head.value, nil
+	return a.head.value
 }
 
 // Pop returns the element at the top of the stack, and then remove it from stack
 // If stack is empty, then error = ErrStackEmpty
-func (a *StackImpl) Pop() (interface{}, error) {
+func (a *StackImpl[T]) Pop() T {
 	if a.IsEmpty() {
-		return nil, stack.ErrStackEmpty
+		panic("stack is empty")
 	}
 
 	elem := a.head.value
 	a.head = a.head.next
 	a.currentSize--
-	return elem, nil
+	return elem
 }

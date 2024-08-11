@@ -1,26 +1,19 @@
 package factory
 
 import (
-	"errors"
-
 	"github.com/enix223/gokeeper/stack"
 	"github.com/enix223/gokeeper/stack/list"
 	"github.com/enix223/gokeeper/stack/slice"
 )
 
-var (
-	// ErrInvalidType error indicate invalid stack type
-	ErrInvalidType = errors.New("Invalid stack type")
-)
-
 // CreateStack create a stack with given type
-func CreateStack(typ string, size uint) (stack.Stack, error) {
+func CreateStack[T any](typ string, size uint) stack.Stack[T] {
 	switch typ {
 	case "list":
-		return list.NewStack(size)
+		return list.NewStack[T](size)
 	case "slice":
-		return slice.NewStack(size)
+		return slice.NewStack[T](size)
 	default:
-		return nil, ErrInvalidType
+		panic("invalid stack type")
 	}
 }

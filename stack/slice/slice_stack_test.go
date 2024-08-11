@@ -3,149 +3,68 @@ package slice
 import (
 	"testing"
 
-	"github.com/enix223/gokeeper/stack"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestStackCreateWithErr(t *testing.T) {
-	_, err := NewStack(0)
-	if err == nil {
-		t.Errorf("exp error = nil, but: %v", err)
-	}
+	assert.PanicsWithValue(t, "size should not be 0", func() {
+		NewStack[int](0)
+	})
 }
 
 func TestStackEmptyCheck(t *testing.T) {
-	s, err := NewStack(10)
-	if err != nil {
-		t.Fatalf("exp stack create success, but error: %v", err)
-	}
-
-	exp := true
-	got := s.IsEmpty()
-	if !got {
-		t.Errorf("exp: %v, got: %v", exp, got)
-	}
+	var s = NewStack[int](10)
+	assert.True(t, s.IsEmpty())
 }
 
 func TestStackFullCheck(t *testing.T) {
-	s, err := NewStack(1)
-	if err != nil {
-		t.Fatalf("exp stack create success, but error: %v", err)
-	}
-
-	err = s.Push(1)
-	if err != nil {
-		t.Fatalf("exp: nil, got: %v", err)
-	}
-
-	exp := true
-	got := s.IsFull()
-	if !got {
-		t.Errorf("exp: %v, got: %v", exp, got)
-	}
+	var s = NewStack[int](1)
+	s.Push(1)
+	assert.True(t, s.IsFull())
 }
 
 func TestStackMakeEmpty(t *testing.T) {
-	s, err := NewStack(10)
-	if err != nil {
-		t.Fatalf("exp stack create success, but error: %v", err)
-	}
-
-	err = s.Push(1)
-	if err != nil {
-		t.Fatalf("exp: nil, got: %v", err)
-	}
-
-	exp := false
-	got := s.IsEmpty()
-	if got {
-		t.Errorf("exp: %v, got: %v", exp, got)
-	}
+	var s = NewStack[int](10)
+	s.Push(1)
+	assert.False(t, s.IsEmpty())
 
 	s.MakeEmpty()
-	exp = true
-	got = s.IsEmpty()
-	if !got {
-		t.Errorf("exp: %v, got: %v", exp, got)
-	}
+	assert.True(t, s.IsEmpty())
 }
 
 func TestStackPush(t *testing.T) {
-	s, err := NewStack(1)
-	if err != nil {
-		t.Fatalf("exp stack create success, but error: %v", err)
-	}
-
-	err = s.Push(1)
-	if err != nil {
-		t.Fatalf("exp: nil, got: %v", err)
-	}
-
-	err = s.Push(2)
-	if err == nil {
-		t.Fatalf("exp: %v, got: %v", stack.ErrStackFull, err)
-	}
+	var s = NewStack[int](1)
+	s.Push(1)
+	assert.PanicsWithValue(t, "stack is full", func() {
+		s.Push(2)
+	})
 }
 
 func TestStackPop(t *testing.T) {
-	s, err := NewStack(1)
-	if err != nil {
-		t.Fatalf("exp stack create success, but error: %v", err)
-	}
-
-	err = s.Push(1)
-	if err != nil {
-		t.Fatalf("exp: nil, got: %v", err)
-	}
-
-	elem, err := s.Pop()
-	if err != nil {
-		t.Fatalf("exp: %v, got: %v", nil, err)
-	}
-
-	v := elem.(int)
-	if v != 1 {
-		t.Errorf("exp: %v, got: %v", 1, v)
-	}
-
-	_, err = s.Pop()
-	if err == nil {
-		t.Errorf("exp: %v, got: %v", stack.ErrStackEmpty, err)
-	}
+	var s = NewStack[int](1)
+	s.Push(1)
+	elem := s.Pop()
+	assert.Equal(t, 1, elem)
+	assert.PanicsWithValue(t, "stack is empty", func() {
+		s.Pop()
+	})
 }
 
 func TestStackTop(t *testing.T) {
-	s, err := NewStack(1)
-	if err != nil {
-		t.Fatalf("exp stack create success, but error: %v", err)
-	}
+	var s = NewStack[int](1)
+	assert.PanicsWithValue(t, "stack is empty", func() {
+		s.Top()
+	})
 
-	err = s.Push(1)
-	if err != nil {
-		t.Fatalf("exp: nil, got: %v", err)
-	}
+	s.Push(1)
 
-	elem, err := s.Top()
-	if err != nil {
-		t.Fatalf("exp: %v, got: %v", nil, err)
-	}
+	elem := s.Top()
+	assert.Equal(t, 1, elem)
 
-	v := elem.(int)
-	if v != 1 {
-		t.Errorf("exp: %v, got: %v", 1, v)
-	}
+	assert.False(t, s.IsEmpty())
 
-	empty := s.IsEmpty()
-	if empty {
-		t.Errorf("exp: %v, got: %v", false, empty)
-	}
-
-	_, err = s.Pop()
-	if err != nil {
-		t.Fatalf("exp: nil, got: %v", err)
-	}
-
-	_, err = s.Top()
-	if err == nil {
-		t.Fatalf("exp: %v, got: %v", stack.ErrStackEmpty, err)
-	}
+	s.Pop()
+	assert.PanicsWithValue(t, "stack is empty", func() {
+		s.Pop()
+	})
 }
