@@ -35,7 +35,7 @@ func (a *StackImpl[T]) IsEmpty() bool {
 
 // IsFull check stack is full or not
 func (a *StackImpl[T]) IsFull() bool {
-	return a.currentcap == a.cap
+	return a.cap > 0 && a.currentcap == a.cap
 }
 
 // MakeEmpty clear stack
