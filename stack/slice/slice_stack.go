@@ -5,34 +5,36 @@ import "github.com/enix223/gokeeper/stack"
 // StackImpl stack implementation with slice
 type StackImpl[T any] struct {
 	elemenets []T
-	head      int
+	cap       int
 }
 
-// NewStack create a stack with given size
-func NewStack[T any](size uint) stack.Stack[T] {
-	if size == 0 {
-		panic("size should not be 0")
+// NewStack create a stack with given capacity
+//
+// If cap = 0, then unlimited capacity stack is created
+func NewStack[T any](cap int) stack.Stack[T] {
+	if cap < 0 {
+		panic("cap should greater or equals 0")
 	}
-
 	s := new(StackImpl[T])
-	s.elemenets = make([]T, 0, size)
-	s.head = -1
+	s.elemenets = make([]T, 0, cap)
+	s.cap = cap
 	return s
 }
 
 // IsEmpty check stack is empty or not
 func (s *StackImpl[T]) IsEmpty() bool {
-	return s.head == -1
+	return len(s.elemenets) == 0
 }
 
 // IsFull check stack is full or not
 func (s *StackImpl[T]) IsFull() bool {
-	return s.head == cap(s.elemenets)-1
+	return s.cap > 0 && len(s.elemenets) == s.cap
 }
 
 // MakeEmpty clear the stack
-func (s *StackImpl[T]) MakeEmpty() {
-	s.head = -1
+func (s *StackImpl[T]) Clear() {
+	// make the old elements gc
+	s.elemenets = make([]T, 0, s.cap)
 }
 
 // Push push an element into stack
@@ -43,17 +45,16 @@ func (s *StackImpl[T]) Push(elem T) {
 	}
 
 	s.elemenets = append(s.elemenets, elem)
-	s.head++
 }
 
-// Top return the element in the top of the stack, if stack is empty,
-// then return ErrStackEmpty
-func (s *StackImpl[T]) Top() T {
+// Peek return the element in the top of the stack, if stack is empty,
+// then return panic
+func (s *StackImpl[T]) Peek() T {
 	if s.IsEmpty() {
 		panic("stack is empty")
 	}
 
-	return s.elemenets[s.head]
+	return s.elemenets[s.head()]
 }
 
 // Pop return the element at the top of the stack, and remove it from the stack
@@ -63,7 +64,12 @@ func (s *StackImpl[T]) Pop() T {
 		panic("stack is empty")
 	}
 
-	elem := s.elemenets[s.head]
-	s.head--
+	var head = s.head()
+	elem := s.elemenets[head]
+	s.elemenets = s.elemenets[:head]
 	return elem
+}
+
+func (s *StackImpl[T]) head() int {
+	return len(s.elemenets) - 1
 }

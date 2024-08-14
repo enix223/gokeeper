@@ -4,8 +4,8 @@ package stack
 type Stack[T any] interface {
 	IsEmpty() bool
 	IsFull() bool
-	MakeEmpty()
+	Clear()
 	Push(elem T)
-	Top() T
+	Peek() T
 	Pop() T
 }

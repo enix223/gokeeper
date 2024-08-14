@@ -7,8 +7,8 @@ import (
 )
 
 func TestStackCreateWithErr(t *testing.T) {
-	assert.PanicsWithValue(t, "size should not be 0", func() {
-		NewStack[int](0)
+	assert.PanicsWithValue(t, "cap should greater or equals 0", func() {
+		NewStack[int](-1)
 	})
 }
 
@@ -28,7 +28,7 @@ func TestStackMakeEmpty(t *testing.T) {
 	s.Push(1)
 	assert.False(t, s.IsEmpty())
 
-	s.MakeEmpty()
+	s.Clear()
 	assert.True(t, s.IsEmpty())
 }
 
@@ -54,11 +54,11 @@ func TestStackPop(t *testing.T) {
 func TestStackTop(t *testing.T) {
 	var s = NewStack[int](1)
 	assert.PanicsWithValue(t, "stack is empty", func() {
-		s.Top()
+		s.Peek()
 	})
 
 	s.Push(1)
-	var elem = s.Top()
+	var elem = s.Peek()
 	assert.Equal(t, 1, elem)
 	assert.False(t, s.IsEmpty())
 	s.Pop()

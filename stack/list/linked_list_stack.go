@@ -9,21 +9,22 @@ type node[T any] struct {
 
 // StackImpl stack implementation with linked list
 type StackImpl[T any] struct {
-	head        *node[T]
-	size        uint
-	currentSize uint
+	head       *node[T]
+	cap        int
+	currentcap int
 }
 
-// NewStack create a stack, if size equal 0, then error = ErrStackInvalidSize
-func NewStack[T any](size uint) stack.Stack[T] {
-	if size == 0 {
-		panic("size should not be 0")
+// NewStack create a stack with linked list
+//
+// If cap = 0, then unlimited capacity stack is created
+func NewStack[T any](cap int) stack.Stack[T] {
+	if cap < 0 {
+		panic("cap should greater or equals 0")
 	}
-
 	a := new(StackImpl[T])
 	a.head = nil
-	a.size = size
-	a.currentSize = 0
+	a.cap = cap
+	a.currentcap = 0
 	return a
 }
 
@@ -34,13 +35,13 @@ func (a *StackImpl[T]) IsEmpty() bool {
 
 // IsFull check stack is full or not
 func (a *StackImpl[T]) IsFull() bool {
-	return a.currentSize == a.size
+	return a.currentcap == a.cap
 }
 
 // MakeEmpty clear stack
-func (a *StackImpl[T]) MakeEmpty() {
+func (a *StackImpl[T]) Clear() {
 	a.head = nil
-	a.currentSize = 0
+	a.currentcap = 0
 }
 
 // Push push an element into the stack.
@@ -54,12 +55,12 @@ func (a *StackImpl[T]) Push(elem T) {
 	n.next = a.head
 	n.value = elem
 	a.head = n
-	a.currentSize++
+	a.currentcap++
 }
 
 // Top returns the element at the top of the stack
 // If stack is empty, then error = ErrStackEmpty
-func (a *StackImpl[T]) Top() T {
+func (a *StackImpl[T]) Peek() T {
 	if a.IsEmpty() {
 		panic("stack is empty")
 	}
@@ -76,6 +77,6 @@ func (a *StackImpl[T]) Pop() T {
 
 	elem := a.head.value
 	a.head = a.head.next
-	a.currentSize--
+	a.currentcap--
 	return elem
 }
